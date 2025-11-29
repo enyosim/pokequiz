@@ -841,11 +841,6 @@ export default function App() {
             </div>
           )}
 
-          {/* LOADING SCREEN */}
-          {gameState === 'loading' && (
-              <LoadingScreen isDark={isDark} text={t.loading} />
-          )}
-
           {/* GAMEPLAY */}
       {(gameState === 'playing' || gameState === 'revealed') && (
              <div className="flex-1 flex flex-col justify-between gap-4 h-full">
@@ -1035,19 +1030,3 @@ export default function App() {
     </div>
   );
 }
-
-// LOADING SCREEN
-const LoadingScreen = ({ isDark, text }) => {
-    const loadingMons = [25, 1, 4, 7, 133, 52, 54, 175, 39, 6];
-    const randomMon = useRef(loadingMons[Math.floor(Math.random() * loadingMons.length)]).current;
-    const imgUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomMon}.png`;
-
-    return (
-        <div className="flex-1 flex flex-col items-center justify-center animate-in fade-in duration-300">
-            <div className="animate-bounce-soft">
-                 <img src={imgUrl} alt="Loading..." className={`w-24 h-24 pixelated opacity-80 ${isDark ? 'brightness-125' : ''}`} />
-            </div>
-            <p className={`mt-4 text-sm font-bold tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'} animate-pulse`}>{text}</p>
-        </div>
-    );
-                                      }
