@@ -778,11 +778,11 @@ export default function App() {
 
       {showDetails && <PokemonDetails pokemon={currentPokemon} onClose={() => setShowDetails(false)} isDark={isDark} lang={lang} texts={t} />}
 
-      <main className="flex-1 w-full max-w-lg mx-auto flex flex-col pt-20 pb-4 px-4 min-h-0 relative z-10">
+      <main className="flex-1 w-full max-w-lg md:max-w-4xl mx-auto flex flex-col pt-20 pb-4 px-4 min-h-0 relative z-10">
           
           {/* --- MENU --- */}
           {gameState === 'menu' && (
-            <div className="flex-1 flex flex-col items-center justify-center relative">
+            <div className="flex-1 flex flex-col items-center justify-center relative max-w-md mx-auto w-full">
                 <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png" alt="logo" className="w-32 h-32 mb-6 animate-bounce-slow drop-shadow-2xl mx-auto"/>
                 <div>
                     <h1 className={`text-4xl font-black tracking-tighter mb-8 ${textClass} text-center`}>{t.title}</h1>
@@ -801,7 +801,7 @@ export default function App() {
 
           {/* MODE SELECT */}
           {gameState === 'modeSelect' && (
-            <div className="w-full flex-1 flex flex-col animate-in slide-in-from-right-4 p-2 overflow-y-auto no-scrollbar">
+            <div className="w-full flex-1 flex flex-col animate-in slide-in-from-right-4 p-2 overflow-y-auto no-scrollbar max-w-2xl mx-auto">
                 <h2 className={`text-2xl font-bold ${textClass} text-center mb-6`}>{t.modeSelect}</h2>
                 
                 <div className="space-y-8 pb-8">
@@ -878,131 +878,144 @@ export default function App() {
                  </div>
 
                  {/* CARD */}
-                 <div className={`flex-1 rounded-[2.5rem] shadow-xl border-4 relative flex flex-col transition-all duration-300 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-white'} min-h-0 mb-2 overflow-hidden`}>
-                     <div className={`relative flex-1 min-h-0 flex flex-col items-center justify-center p-4 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-b from-blue-50 to-white'}`}>
-                         
-                         {/* TIMER - FIX: COLOR TEXT FOR DARK MODE */}
-                         {gameState === 'playing' && (
-                             <div className={`absolute top-4 right-4 flex items-center gap-1 font-mono text-xl font-bold z-20 opacity-50 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                                 {timeLeft}<Timer size={16}/>
+                  <div className={`flex-1 rounded-[2.5rem] shadow-xl border-4 relative flex flex-col md:flex-row transition-all duration-300 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-white'} min-h-0 mb-2 overflow-hidden`}>
+                      
+                      {/* LEFT COLUMN: IMAGE AREA */}
+                      <div className={`relative flex-1 min-h-0 flex flex-col items-center justify-center p-4 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-b from-blue-50 to-white'} md:border-r ${isDark ? 'md:border-slate-800' : 'md:border-slate-100'}`}>
+                          
+                          {/* TIMER - MOBILE ONLY */}
+                          {gameState === 'playing' && (
+                              <div className={`absolute top-4 right-4 flex md:hidden items-center gap-1 font-mono text-xl font-bold z-20 opacity-50 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                  {timeLeft}<Timer size={16}/>
+                              </div>
+                          )}
+
+                          {/* HINT BUTTON */}
+                          {gameState === 'playing' && !hintUsed && (
+                             (!isTypeMode && score >= 100) || (isTypeMode && lives === MAX_LIVES)
+                          ) && (
+                              <div className="absolute top-4 left-4 z-20">
+                                  <AnimButton onClick={handleHint} className="bg-yellow-400 hover:bg-yellow-300 text-yellow-900 px-3 py-1 rounded-full shadow-lg font-bold text-xs flex items-center gap-1" title={t.hint}>
+                                      <Lightbulb size={14} /> {t.hint}
+                                  </AnimButton>
+                              </div>
+                          )}
+
+                          {/* IMAGE AREA */}
+                          {currentPokemon && (
+                              <div className="relative flex flex-col items-center justify-center h-full w-full z-10 min-h-0 p-2">
+                                  {/* INFO EXTRA EN MODO TIPO */}
+                                  {isTypeMode && (
+                                      <div className="text-center animate-in fade-in slide-in-from-top-4 mb-2 z-20">
+                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">#{String(currentPokemon.id).padStart(3,'0')} — {currentPokemon.region}</p>
+                                          <h2 className={`text-lg sm:text-2xl font-black uppercase tracking-tight leading-none ${isDark ? 'text-white' : 'text-slate-800'}`}>{currentPokemon.name}</h2>
+                                      </div>
+                                  )}
+                                  <img 
+                                      key={currentPokemon.id}
+                                      src={currentPokemon.image} 
+                                      alt="Who?" 
+                                      onLoad={() => { setImageLoaded(true); if (gameState === 'loading') setGameState('playing'); }} 
+                                      className={`h-full max-h-[110px] sm:max-h-[150px] md:max-h-[220px] max-w-full object-contain drop-shadow-2xl transition-all duration-500 ${isTypeMode || gameState === 'revealed' ? 'filter-none scale-105' : `brightness-0 opacity-80 ${isDark ? 'invert' : ''}`} ${!imageLoaded ? 'opacity-0' : ''}`}
+                                  />
+                              </div>
+                          )}
+
+                          {/* HINT DISPLAY FOR CLASSIC MODE (FIXED) */}
+                          {!isTypeMode && hintUsed && currentPokemon && (
+                             <div className="absolute bottom-4 z-20 flex gap-2 animate-in fade-in slide-in-from-bottom-2">
+                                 {currentPokemon.types.map(t => <TypeBadge key={t} type={t} lang={lang} />)}
                              </div>
-                         )}
+                          )}
+                      </div>
 
-                         {/* HINT BUTTON */}
-                         {gameState === 'playing' && !hintUsed && (
-                            (!isTypeMode && score >= 100) || (isTypeMode && lives === MAX_LIVES)
-                         ) && (
-                             <div className="absolute top-4 left-4 z-20">
-                                 <AnimButton onClick={handleHint} className="bg-yellow-400 hover:bg-yellow-300 text-yellow-900 px-3 py-1 rounded-full shadow-lg font-bold text-xs flex items-center gap-1" title={t.hint}>
-                                     <Lightbulb size={14} /> {t.hint}
-                                 </AnimButton>
-                             </div>
-                         )}
+                      {/* RIGHT COLUMN: PROGRESS & OPTIONS */}
+                      <div className={`flex-1 flex flex-col justify-center min-h-0 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+                          
+                          {/* TIMER - DESKTOP ONLY */}
+                          {gameState === 'playing' && (
+                              <div className={`hidden md:flex items-center justify-end gap-1 font-mono text-xl font-bold p-4 pb-0 opacity-50 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                  {timeLeft}<Timer size={16}/>
+                              </div>
+                          )}
 
-                         {/* IMAGE AREA */}
-                         {currentPokemon && (
-                             <div className="relative flex flex-col items-center justify-center h-full w-full z-10 min-h-0 p-2">
-                                 {/* INFO EXTRA EN MODO TIPO */}
-                                 {isTypeMode && (
-                                     <div className="text-center animate-in fade-in slide-in-from-top-4 mb-2 z-20">
-                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">#{String(currentPokemon.id).padStart(3,'0')} — {currentPokemon.region}</p>
-                                         <h2 className={`text-lg sm:text-2xl font-black uppercase tracking-tight leading-none ${isDark ? 'text-white' : 'text-slate-800'}`}>{currentPokemon.name}</h2>
-                                     </div>
-                                 )}
-                                 <img 
-                                     key={currentPokemon.id}
-                                     src={currentPokemon.image} 
-                                     alt="Who?" 
-                                     onLoad={() => { setImageLoaded(true); if (gameState === 'loading') setGameState('playing'); }} 
-                                     className={`h-full max-h-[110px] sm:max-h-[150px] max-w-full object-contain drop-shadow-2xl transition-all duration-500 ${isTypeMode || gameState === 'revealed' ? 'filter-none scale-105' : `brightness-0 opacity-80 ${isDark ? 'invert' : ''}`} ${!imageLoaded ? 'opacity-0' : ''}`}
-                                 />
-                             </div>
-                         )}
+                          {/* PROGRESS BAR - VISIBLE ALWAYS */}
+                          <div className={`w-full h-2 shrink-0 ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}>
+                             <div 
+                                 className={`h-full rounded-r-full ${timeLeft === (isTypeMode ? 15 : 10) ? 'transition-none' : 'transition-all duration-1000 ease-linear'} ${timeLeft <= 3 ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-blue-500'}`} 
+                                 style={{ width: gameState === 'playing' ? `${(timeLeft / (isTypeMode ? 15 : 10)) * 100}%` : '0%' }}
+                             ></div>
+                          </div>
 
-                         {/* HINT DISPLAY FOR CLASSIC MODE (FIXED) */}
-                         {!isTypeMode && hintUsed && currentPokemon && (
-                            <div className="absolute bottom-4 z-20 flex gap-2 animate-in fade-in slide-in-from-bottom-2">
-                                {currentPokemon.types.map(t => <TypeBadge key={t} type={t} lang={lang} />)}
-                            </div>
-                         )}
-                     </div>
+                          {/* OPTIONS GRID */}
+                          <div className={`p-3 sm:p-4 relative shrink-0 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+                              <div className="grid grid-cols-2 gap-2 sm:gap-3 h-32 sm:h-40">
+                                  {options.map((option, idx) => {
+                                      if (option.hidden) return <div key={idx}></div>; 
 
-                     {/* PROGRESS BAR - VISIBLE ALWAYS */}
-                     <div className={`w-full h-2 shrink-0 ${isDark ? 'bg-slate-800' : 'bg-slate-100'}`}>
-                        <div 
-                            className={`h-full rounded-r-full ${timeLeft === (isTypeMode ? 15 : 10) ? 'transition-none' : 'transition-all duration-1000 ease-linear'} ${timeLeft <= 3 ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-blue-500'}`} 
-                            style={{ width: gameState === 'playing' ? `${(timeLeft / (isTypeMode ? 15 : 10)) * 100}%` : '0%' }}
-                        ></div>
-                     </div>
+                                      const isRevealed = gameState === 'revealed';
+                                      let btnStyle = "";
+                                      let content = null;
 
-                     {/* OPTIONS GRID */}
-                     <div className={`p-3 sm:p-4 relative shrink-0 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
-                         <div className="grid grid-cols-2 gap-2 sm:gap-3 h-32 sm:h-40">
-                             {options.map((option, idx) => {
-                                 if (option.hidden) return <div key={idx}></div>; 
+                                      if (isTypeMode) {
+                                          // BOTONES DE COLORES (TIPO)
+                                          const typesArray = option.types; 
+                                          
+                                          const type1 = TYPE_HEX[typesArray[0]];
+                                          const type2 = typesArray[1] ? TYPE_HEX[typesArray[1]] : type1;
+                                          const background = typesArray.length > 1 
+                                             ? `linear-gradient(135deg, ${type1} 50%, ${type2} 50%)` 
+                                             : type1;
+                                          
+                                          const typeLabel = typesArray.map(t => TYPE_NAMES[t][lang]).join(' / ');
 
-                                 const isRevealed = gameState === 'revealed';
-                                 let btnStyle = "";
-                                 let content = null;
+                                          // FIX: Bordes blancos por defecto en modo Tipo - SIN OPACIDAD
+                                          btnStyle = `h-full rounded-xl border-4 transition-transform active:scale-95 shadow-sm flex items-center justify-center ${isRevealed ? '' : 'hover:scale-105'}`;
+                                          
+                                          if (isRevealed) {
+                                              if (option.value === correctOption) btnStyle = `h-full rounded-xl border-4 border-green-500 ring-4 ring-green-200 z-10 scale-105 flex items-center justify-center filter-none`;
+                                              else if (option.value === selectedOption) btnStyle += " border-red-500 filter-none"; 
+                                              else btnStyle += " border-white/50"; 
+                                          } else {
+                                              btnStyle += " border-white"; // Borde blanco por defecto
+                                          }
 
-                                 if (isTypeMode) {
-                                     // BOTONES DE COLORES (TIPO)
-                                     const typesArray = option.types; 
-                                     
-                                     const type1 = TYPE_HEX[typesArray[0]];
-                                     const type2 = typesArray[1] ? TYPE_HEX[typesArray[1]] : type1;
-                                     const background = typesArray.length > 1 
-                                        ? `linear-gradient(135deg, ${type1} 50%, ${type2} 50%)` 
-                                        : type1;
-                                     
-                                     const typeLabel = typesArray.map(t => TYPE_NAMES[t][lang]).join(' / ');
+                                          content = (
+                                              <div className={btnStyle} style={{ background }}>
+                                                  {/* Texto blanco con sombra para contraste en cualquier fondo */}
+                                                  <span className="text-white font-black uppercase drop-shadow-md text-sm text-center px-2">{typeLabel}</span>
+                                              </div>
+                                          );
+                                      } else {
+                                          // BOTONES DE TEXTO (Clásico)
+                                          btnStyle = isDark ? "bg-slate-800 text-slate-200 border-slate-700" : "bg-white text-slate-600 border-slate-200";
+                                          let icon = null;
+                                          if (isRevealed) {
+                                             if (option.value === correctOption) { btnStyle = "bg-green-500 text-white border-green-600"; icon = <Check size={16}/>; }
+                                             else if (option.value === selectedOption) { btnStyle = "bg-red-500 text-white border-red-600"; icon = <X size={16}/>; }
+                                             else btnStyle = isDark ? "bg-slate-800 text-white border-slate-700 opacity-100" : "bg-white text-slate-600 border-slate-200 opacity-100"; // Sin opacidad baja
+                                          }
+                                          
+                                          // FIX: FORCED WHITE TEXT IN DARK MODE FOR OPTIONS
+                                          const textColor = isDark ? 'text-white font-black' : 'text-slate-600';
 
-                                     // FIX: Bordes blancos por defecto en modo Tipo - SIN OPACIDAD
-                                     btnStyle = `h-full rounded-xl border-4 transition-transform active:scale-95 shadow-sm flex items-center justify-center ${isRevealed ? '' : 'hover:scale-105'}`;
-                                     
-                                     if (isRevealed) {
-                                         if (option.value === correctOption) btnStyle = `h-full rounded-xl border-4 border-green-500 ring-4 ring-green-200 z-10 scale-105 flex items-center justify-center filter-none`;
-                                         else if (option.value === selectedOption) btnStyle += " border-red-500 filter-none"; 
-                                         else btnStyle += " border-white/50"; 
-                                     } else {
-                                         btnStyle += " border-white"; // Borde blanco por defecto
-                                     }
+                                          content = (
+                                             <div className={`h-full px-2 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 border-2 ${btnStyle} ${textColor}`}>
+                                                 {icon}<span className="truncate">{option.label}</span>
+                                             </div>
+                                          );
+                                      }
 
-                                     content = (
-                                         <div className={btnStyle} style={{ background }}>
-                                             {/* Texto blanco con sombra para contraste en cualquier fondo */}
-                                             <span className="text-white font-black uppercase drop-shadow-md text-sm text-center px-2">{typeLabel}</span>
-                                         </div>
-                                     );
-                                 } else {
-                                     // BOTONES DE TEXTO (Clásico)
-                                     btnStyle = isDark ? "bg-slate-800 text-slate-200 border-slate-700" : "bg-white text-slate-600 border-slate-200";
-                                     let icon = null;
-                                     if (isRevealed) {
-                                        if (option.value === correctOption) { btnStyle = "bg-green-500 text-white border-green-600"; icon = <Check size={16}/>; }
-                                        else if (option.value === selectedOption) { btnStyle = "bg-red-500 text-white border-red-600"; icon = <X size={16}/>; }
-                                        else btnStyle = isDark ? "bg-slate-800 text-white border-slate-700 opacity-100" : "bg-white text-slate-600 border-slate-200 opacity-100"; // Sin opacidad baja
-                                     }
-                                     
-                                     // FIX: FORCED WHITE TEXT IN DARK MODE FOR OPTIONS
-                                     const textColor = isDark ? 'text-white font-black' : 'text-slate-600';
-
-                                     content = (
-                                        <div className={`h-full px-2 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 border-2 ${btnStyle} ${textColor}`}>
-                                            {icon}<span className="truncate">{option.label}</span>
-                                        </div>
-                                     );
-                                 }
-
-                                 return (
-                                     <AnimButton key={idx} disabled={isRevealed} onClick={() => handleGuess(option.value)} className="w-full h-full">
-                                         {content}
-                                     </AnimButton>
-                                 );
-                             })}
-                         </div>
-                     </div>
-                 </div>
+                                      return (
+                                          <AnimButton key={idx} disabled={isRevealed} onClick={() => handleGuess(option.value)} className="w-full h-full">
+                                              {content}
+                                          </AnimButton>
+                                      );
+                                  })}
+                              </div>
+                          </div>
+                      </div>
+                  </div>
 
                  {/* FOOTER ACTIONS */}
                  <div className={`shrink-0 w-full flex items-center justify-center transition-all duration-300 ${gameState === 'revealed' ? 'h-16 sm:h-20 mt-2' : 'h-0 overflow-hidden'}`}>
@@ -1021,7 +1034,7 @@ export default function App() {
           
           {/* GAME OVER SCREEN */}
           {gameState === 'gameOver' && (
-              <div className="flex-1 flex flex-col items-center justify-start animate-in zoom-in pt-4 w-full">
+              <div className="flex-1 flex flex-col items-center justify-start animate-in zoom-in pt-4 w-full max-w-md mx-auto">
                   <div className="text-center mb-4"><h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-red-500 to-orange-600">{t.gameOver}</h1></div>
                   <div className={`flex-grow w-full p-8 rounded-[2.5rem] text-center mb-6 flex flex-col justify-center shadow-2xl ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
                       <p className="text-xs font-bold uppercase opacity-50 mb-2">{isTypeMode ? t.hits : t.finalScore}</p>
