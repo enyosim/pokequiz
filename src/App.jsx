@@ -901,7 +901,14 @@ export default function App() {
 
                          {/* IMAGE AREA */}
                          {currentPokemon && (
-                             <div className="relative flex flex-col items-center justify-center h-full w-full z-10 min-h-0">
+                             <div className="relative flex flex-col items-center justify-center h-full w-full z-10 min-h-0 p-2">
+                                 {/* INFO EXTRA EN MODO TIPO */}
+                                 {isTypeMode && (
+                                     <div className="text-center animate-in fade-in slide-in-from-top-4 mb-2 z-20">
+                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">#{String(currentPokemon.id).padStart(3,'0')} — {currentPokemon.region}</p>
+                                         <h2 className={`text-lg sm:text-2xl font-black uppercase tracking-tight leading-none ${isDark ? 'text-white' : 'text-slate-800'}`}>{currentPokemon.name}</h2>
+                                     </div>
+                                 )}
                                  <img 
                                      key={currentPokemon.id}
                                      src={currentPokemon.image} 
@@ -909,13 +916,6 @@ export default function App() {
                                      onLoad={() => { setImageLoaded(true); if (gameState === 'loading') setGameState('playing'); }} 
                                      className={`h-full max-h-[110px] sm:max-h-[150px] max-w-full object-contain drop-shadow-2xl transition-all duration-500 ${isTypeMode || gameState === 'revealed' ? 'filter-none scale-105' : `brightness-0 opacity-80 ${isDark ? 'invert' : ''}`} ${!imageLoaded ? 'opacity-0' : ''}`}
                                  />
-                                 {/* INFO EXTRA EN MODO TIPO */}
-                                 {isTypeMode && (
-                                     <div className="mt-4 text-center animate-in fade-in slide-in-from-bottom-4">
-                                         <p className="text-xs font-bold text-slate-400">#{String(currentPokemon.id).padStart(3,'0')} — {currentPokemon.region}</p>
-                                         <h2 className={`text-2xl font-black uppercase tracking-tight ${isDark ? 'text-white' : 'text-slate-800'}`}>{currentPokemon.name}</h2>
-                                     </div>
-                                 )}
                              </div>
                          )}
 
