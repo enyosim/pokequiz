@@ -907,7 +907,7 @@ export default function App() {
                                      src={currentPokemon.image} 
                                      alt="Who?" 
                                      onLoad={() => { setImageLoaded(true); if (gameState === 'loading') setGameState('playing'); }} 
-                                     className={`w-28 h-28 sm:w-40 sm:h-40 max-h-[25vh] object-contain drop-shadow-2xl transition-all duration-500 ${isTypeMode || gameState === 'revealed' ? 'filter-none scale-105 sm:scale-110' : `brightness-0 opacity-80 ${isDark ? 'invert' : ''}`} ${!imageLoaded ? 'opacity-0' : ''}`}
+                                     className={`h-full max-h-[110px] sm:max-h-[150px] max-w-full object-contain drop-shadow-2xl transition-all duration-500 ${isTypeMode || gameState === 'revealed' ? 'filter-none scale-105' : `brightness-0 opacity-80 ${isDark ? 'invert' : ''}`} ${!imageLoaded ? 'opacity-0' : ''}`}
                                  />
                                  {/* INFO EXTRA EN MODO TIPO */}
                                  {isTypeMode && (
