@@ -478,8 +478,15 @@ export default function App() {
   const fetchRoundData = useCallback(async (range, history, isTypeMode) => {
     if (!range) return null;
     const [min, max] = range;
+    const totalInRange = max - min + 1;
+    const solvedInRangeCount = Array.from(history || []).filter(hId => hId >= min && hId <= max).length;
+    const checkHistory = solvedInRangeCount < totalInRange;
+
     let id, attempts = 0;
-    do { id = getRandomId(min, max); attempts++; } while (history.has(id) && attempts < 100);
+    do { 
+      id = getRandomId(min, max); 
+      attempts++; 
+    } while (checkHistory && history.has(id) && attempts < 100);
 
     try {
         const [correctSpecies, correctPokemon] = await Promise.all([
@@ -771,7 +778,7 @@ export default function App() {
 
       {showDetails && <PokemonDetails pokemon={currentPokemon} onClose={() => setShowDetails(false)} isDark={isDark} lang={lang} texts={t} />}
 
-      <main className="flex-1 w-full max-w-lg mx-auto flex flex-col pt-20 pb-4 px-4 h-full relative z-10">
+      <main className="flex-1 w-full max-w-lg mx-auto flex flex-col pt-20 pb-4 px-4 min-h-0 relative z-10">
           
           {/* --- MENU --- */}
           {gameState === 'menu' && (
@@ -843,7 +850,7 @@ export default function App() {
 
           {/* GAMEPLAY */}
       {(gameState === 'playing' || gameState === 'revealed') && (
-             <div className="flex-1 flex flex-col justify-between gap-4 h-full">
+             <div className="flex-1 flex flex-col justify-between gap-2 sm:gap-4 min-h-0">
                  
                  {/* HUD */}
                  <div className="grid grid-cols-3 items-end px-2 shrink-0 relative z-20">
@@ -894,13 +901,13 @@ export default function App() {
 
                          {/* IMAGE AREA */}
                          {currentPokemon && (
-                             <div className="relative flex flex-col items-center justify-center h-full w-full z-10">
+                             <div className="relative flex flex-col items-center justify-center h-full w-full z-10 min-h-0">
                                  <img 
                                      key={currentPokemon.id}
                                      src={currentPokemon.image} 
                                      alt="Who?" 
                                      onLoad={() => { setImageLoaded(true); if (gameState === 'loading') setGameState('playing'); }} 
-                                     className={`w-40 h-40 object-contain drop-shadow-2xl transition-all duration-500 ${isTypeMode || gameState === 'revealed' ? 'filter-none scale-110' : `brightness-0 opacity-80 ${isDark ? 'invert' : ''}`} ${!imageLoaded ? 'opacity-0' : ''}`}
+                                     className={`w-28 h-28 sm:w-40 sm:h-40 max-h-[25vh] object-contain drop-shadow-2xl transition-all duration-500 ${isTypeMode || gameState === 'revealed' ? 'filter-none scale-105 sm:scale-110' : `brightness-0 opacity-80 ${isDark ? 'invert' : ''}`} ${!imageLoaded ? 'opacity-0' : ''}`}
                                  />
                                  {/* INFO EXTRA EN MODO TIPO */}
                                  {isTypeMode && (
@@ -929,8 +936,8 @@ export default function App() {
                      </div>
 
                      {/* OPTIONS GRID */}
-                     <div className={`p-4 relative shrink-0 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
-                         <div className="grid grid-cols-2 gap-3 h-40">
+                     <div className={`p-3 sm:p-4 relative shrink-0 ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+                         <div className="grid grid-cols-2 gap-2 sm:gap-3 h-32 sm:h-40">
                              {options.map((option, idx) => {
                                  if (option.hidden) return <div key={idx}></div>; 
 
@@ -998,7 +1005,7 @@ export default function App() {
                  </div>
 
                  {/* FOOTER ACTIONS */}
-                 <div className="h-20 shrink-0 w-full flex items-center justify-center">
+                 <div className={`shrink-0 w-full flex items-center justify-center transition-all duration-300 ${gameState === 'revealed' ? 'h-16 sm:h-20 mt-2' : 'h-0 overflow-hidden'}`}>
                     {gameState === 'revealed' && (
                          <div className="w-full flex gap-3 animate-in slide-in-from-bottom-2 fade-in">
                             <JuicyButton onClick={() => setShowDetails(true)} variant="pokedex" icon={Book}>{t.viewData}</JuicyButton>
