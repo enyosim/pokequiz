@@ -295,7 +295,7 @@ const TypeBadge = ({ type, lang }) => {
 };
 
 const LivesDisplay = ({ lives, maxLives }) => (
-  <div className="flex gap-1.5 p-2 bg-black/5 dark:bg-white/5 rounded-full backdrop-blur-sm transition-colors">
+  <div className="flex gap-1.5 p-2 bg-slate-200/80 dark:bg-slate-800/80 rounded-full backdrop-blur-sm transition-colors border border-slate-300/40 dark:border-slate-700/40 shadow-sm">
     {[...Array(maxLives)].map((_, i) => (
       <div key={i} className="relative">
         <Heart size={26} className={`transition-all duration-500 ${i < lives ? 'fill-pink-500 text-pink-500 drop-shadow-md scale-100' : 'fill-slate-300 dark:fill-slate-600 text-slate-300 dark:text-slate-600 opacity-50 scale-75'}`} />
@@ -760,7 +760,7 @@ export default function App() {
   const isGameOverPending = lives <= 0 && gameState === 'revealed';
 
   return (
-    <div className={`h-[100dvh] w-screen ${bgClass} font-sans transition-colors duration-500 overflow-hidden relative select-none flex flex-col`}>
+    <div className={`h-[100dvh] w-screen ${bgClass} ${isDark ? 'dark' : ''} font-sans transition-colors duration-500 overflow-hidden relative select-none flex flex-col`}>
       <style>{customStyles}</style>
       {healAnim && <div className="fixed inset-0 z-[100] flex items-center justify-center animate-in fade-in zoom-in"><Heart size={200} className="text-pink-500 fill-pink-500 drop-shadow-2xl" /></div>}
 
@@ -1017,18 +1017,30 @@ export default function App() {
                       </div>
                   </div>
 
-                 {/* FOOTER ACTIONS */}
-                 <div className={`shrink-0 w-full flex items-center justify-center transition-all duration-300 ${gameState === 'revealed' ? 'h-16 sm:h-20 mt-2' : 'h-0 overflow-hidden'}`}>
-                    {gameState === 'revealed' && (
-                         <div className="w-full flex gap-3 animate-in slide-in-from-bottom-2 fade-in">
-                            <JuicyButton onClick={() => setShowDetails(true)} variant="pokedex" icon={Book}>{t.viewData}</JuicyButton>
-                            <JuicyButton onClick={() => {
-                                if (lives <= 0) { setGameState('gameOver'); playAudio(SFX.click); }
-                                else { loadNewRound(); }
-                            }} variant="secondary" icon={ArrowRight}>{lives > 0 ? t.next : t.exit}</JuicyButton>
-                         </div>
-                    )}
-                 </div>
+                  {/* FOOTER ACTIONS */}
+                  <div className="shrink-0 h-16 sm:h-20 w-full flex items-center justify-center mt-2">
+                      <div className="w-full flex gap-3">
+                          <JuicyButton 
+                              onClick={() => setShowDetails(true)} 
+                              variant="pokedex" 
+                              icon={Book}
+                              disabled={gameState !== 'revealed'}
+                          >
+                              {t.viewData}
+                          </JuicyButton>
+                          <JuicyButton 
+                              onClick={() => {
+                                  if (lives <= 0) { setGameState('gameOver'); playAudio(SFX.click); }
+                                  else { loadNewRound(); }
+                              }} 
+                              variant="secondary" 
+                              icon={ArrowRight}
+                              disabled={gameState !== 'revealed'}
+                          >
+                              {lives > 0 ? t.next : t.exit}
+                          </JuicyButton>
+                      </div>
+                  </div>
              </div>
           )}
           
